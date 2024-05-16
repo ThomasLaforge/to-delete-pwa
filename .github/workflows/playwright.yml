@@ -12,23 +12,6 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
-    services:
-      # Set up a service for the Vite server
-      vite:
-        image: node:16
-        ports:
-          - 5173:5173
-        options: >-
-          --entrypoint /bin/bash
-        volumes:
-          - .:/app
-        command: >
-          -c "
-          cd /app &&
-          npm ci &&
-          npm run dev
-          "
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -40,6 +23,11 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Start Vite server
+        run: npm run dev &
+        env:
+          CI: true
 
       - name: Wait for Vite to start
         run: |
