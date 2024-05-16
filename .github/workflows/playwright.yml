@@ -1,27 +1,49 @@
 name: Playwright Tests
+
 on:
   push:
-    branches: [ main, master ]
+    branches:
+      - main
   pull_request:
-    branches: [ main, master ]
+    branches:
+      - main
+
 jobs:
   test:
-    timeout-minutes: 60
     runs-on: ubuntu-latest
+
+    services:
+      # Set up a service for the Vite server
+      vite:
+        image: node:16
+        ports:
+          - 5173:5173
+        options: >-
+          --entrypoint /bin/bash
+        volumes:
+          - .:/app
+        command: >
+          -c "
+          cd /app &&
+          npm ci &&
+          npm run dev
+          "
+
     steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-node@v4
-      with:
-        node-version: lts/*
-    - name: Install dependencies
-      run: npm ci
-    - name: Install Playwright Browsers
-      run: npx playwright install --with-deps
-    - name: Run Playwright tests
-      run: npx playwright test
-    - uses: actions/upload-artifact@v4
-      if: always()
-      with:
-        name: playwright-report
-        path: playwright-report/
-        retention-days: 30
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Wait for Vite to start
+        run: |
+          timeout 60 sh -c 'until curl -s http://localhost:5173; do echo waiting for vite...; sleep 2; done'
+
+      - name: Run Playwright tests
+        run: npx playwright test
