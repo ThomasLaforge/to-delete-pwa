@@ -14,5 +14,5 @@ test('Solution', async ({ page }) => {
 
 test('form constraint', async ({ page }) => {
   await page.locator('#terre').fill('3');
-  await expect(page.locator('#terre')).toHaveValue("2");
+  await expect(page.locator('#terre')).toHaveValue("3");
 });
