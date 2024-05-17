@@ -1,18 +1,18 @@
 import { test, expect } from '@playwright/test';
 
-test('has title', async ({ page }) => {
-  await page.goto('https://playwright.dev/');
-
-  // Expect a title "to contain" a substring.
-  await expect(page).toHaveTitle(/Playwright/);
+test.beforeEach(async ({ page }) => {
+  await page.goto('http://localhost:5173/');
 });
 
-test('get started link', async ({ page }) => {
-  await page.goto('https://playwright.dev/');
+test('Solution', async ({ page }) => {
+  await page.locator('#terre').fill('2');
+  await page.locator('#solution-btn').click();
 
-  // Click the get started link.
-  await page.getByRole('link', { name: 'Get started' }).click();
+  // Expect a title "to contain" a substring.
+  await expect(page.locator('#solution')).toHaveText("mortin");
+});
 
-  // Expects page to have a heading with the name of Installation.
-  await expect(page.getByRole('heading', { name: 'Installation' })).toBeVisible();
+test('form constraint', async ({ page }) => {
+  await page.locator('#terre').fill('3');
+  await expect(page.locator('#terre')).toHaveValue("2");
 });
